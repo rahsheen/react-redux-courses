@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as courseActions from '../../actions/courseActions';
 import CourseForm from './CourseForm';
+import toastr from 'toastr';
 
 class ManageCoursePage extends Component {
   constructor(props, context) {
@@ -10,7 +11,8 @@ class ManageCoursePage extends Component {
 
     this.state = {
       course: Object.assign({}, props.course),
-      errors: {}
+      errors: {},
+      saving: false
     };
 
     this.updateCourseState = this.updateCourseState.bind(this);
@@ -18,9 +20,9 @@ class ManageCoursePage extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(this.props.course.id != nextProps.course.id) {
+    if (this.props.course.id != nextProps.course.id) {
       // Necessary to populate form when existing course is loaded directly.
-      this.setState({course: Object.assign({}, nextProps.course)});
+      this.setState({ course: Object.assign({}, nextProps.course) });
     }
   }
 
@@ -33,7 +35,18 @@ class ManageCoursePage extends Component {
 
   saveCourse(event) {
     event.preventDefault();
-    this.props.actions.saveCourse(this.state.course);
+    this.setState({saving: true});
+    this.props.actions.saveCourse(this.state.course)
+      .then(() => this.redirect())
+      .catch(error => {
+        toastr.error(error);
+        this.setState({saving: false});
+      });
+  }
+
+  redirect() {
+    this.setState({saving: false});
+    toastr.success('Course saved');
     this.context.router.push('/courses');
   }
 
@@ -45,6 +58,7 @@ class ManageCoursePage extends Component {
         onSave={this.saveCourse}
         course={this.state.course}
         errors={this.state.errors}
+        saving={this.state.saving}
       />
     );
   }
@@ -61,10 +75,10 @@ ManageCoursePage.contextTypes = {
   router: PropTypes.object
 };
 
-function getCourseById (courses, id) {
+function getCourseById(courses, id) {
   const course = courses.filter(course => course.id == id);
 
-  if(course.length) return course[0];
+  if (course.length) return course[0];
   return null;
 }
 
