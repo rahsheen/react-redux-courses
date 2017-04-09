@@ -18,8 +18,24 @@ describe('Course Reducer', () => {
     const newState = courseReducer(initialState, action);
 
     //assert
-    expect(newState.length).toEqual(3);
+    expect(newState.length).toEqual(initialState.length+1);
     expect(newState[0].title).toEqual('A');
+  });
+
+  it('should delete course when passed DELETE_COURSE_SUCCESS', () => {
+    // arrange
+    const initialState = [
+      {id: 'blah', title: 'A'},
+      {id: 'foo', title: 'B'}
+    ];
+
+    const action = actions.deleteCourseSuccess('blah');
+
+    //act
+    const newState = courseReducer(initialState, action);
+
+    //assert
+    expect(newState.length).toEqual(initialState.length-1);
   });
 
   it('should update course when passed UPDATE_COURSE_SUCCESS', () => {
