@@ -132,7 +132,7 @@ function mapStateToProps(state, ownProps) {
 
   if (courseId && state.courses.length > 0) {
     course = getCourseById(state.courses, courseId);
-  }
+  } 
 
   return {
     course: course,
