@@ -5,7 +5,6 @@ import * as courseActions from '../../actions/courseActions';
 import CourseForm from './CourseForm';
 import toastr from 'toastr';
 import { authorsFormattedForDropdown } from '../../selectors/selectors';
-import { browserHistory } from 'react-router';
 
 export class ManageCoursePage extends Component {
   constructor(props, context) {
@@ -20,10 +19,14 @@ export class ManageCoursePage extends Component {
 
     this.updateCourseState = this.updateCourseState.bind(this);
     this.saveCourse = this.saveCourse.bind(this);
+    this.routerWillLeave = this.routerWillLeave.bind(this);
   }
 
   componentDidMount() {
-    this.unlisten = browserHistory.listen(this.routerWillLeave.bind(this));
+    this.unlisten = this.context.router.setRouteLeaveHook(
+      this.props.route, // Not sure this is how I should be getting this
+      this.routerWillLeave
+    );
   }
 
   componentWillReceiveProps(nextProps) {
@@ -39,9 +42,10 @@ export class ManageCoursePage extends Component {
 
   routerWillLeave(nextLocation) {
     // https://github.com/ReactTraining/react-router/blob/v2.4.0/examples/confirming-navigation/app.js
-    // **ALLEGEDLY** return false to prevent a transition w/o prompting the user,
+    // return false to prevent a transition w/o prompting the user,
     // or return a string to allow the user to decide:
-    return false; // Clearly doesn't prevent navigation away
+    if (this.state.dirty)
+      return 'Your work is not saved! Are you sure you want to leave?';
   }
 
   updateCourseState(event) {
@@ -105,7 +109,8 @@ export class ManageCoursePage extends Component {
 ManageCoursePage.propTypes = {
   course: PropTypes.object.isRequired,
   authors: PropTypes.array.isRequired,
-  actions: PropTypes.object.isRequired
+  actions: PropTypes.object.isRequired,
+  route: PropTypes.object.isRequired
 };
 
 //Pull in the React Router context so router is available on this.context.router.
