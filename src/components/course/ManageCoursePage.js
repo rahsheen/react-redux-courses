@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import * as courseActions from '../../actions/courseActions';
 import CourseForm from './CourseForm';
 import toastr from 'toastr';
-import {authorsFormattedForDropdown} from '../../selectors/selectors';
+import { authorsFormattedForDropdown } from '../../selectors/selectors';
 
 export class ManageCoursePage extends Component {
   constructor(props, context) {
@@ -13,7 +13,8 @@ export class ManageCoursePage extends Component {
     this.state = {
       course: Object.assign({}, props.course),
       errors: {},
-      saving: false
+      saving: false,
+      dirty: false
     };
 
     this.updateCourseState = this.updateCourseState.bind(this);
@@ -28,6 +29,8 @@ export class ManageCoursePage extends Component {
   }
 
   updateCourseState(event) {
+    this.setState({ dirty: true });
+
     const field = event.target.name;
     let course = this.state.course;
     course[field] = event.target.value;
@@ -36,14 +39,14 @@ export class ManageCoursePage extends Component {
 
   courseFormIsValid() {
     let formIsValid = true;
-    let errors={};
+    let errors = {};
 
-    if(this.state.course.title.length < 5) {
+    if (this.state.course.title.length < 5) {
       errors.title = 'Title must be at least 5 characters.';
       formIsValid = false;
     }
 
-    this.setState({errors: errors});
+    this.setState({ errors: errors });
     return formIsValid;
   }
 
@@ -54,17 +57,17 @@ export class ManageCoursePage extends Component {
       return;
     }
 
-    this.setState({saving: true});
+    this.setState({ saving: true });
     this.props.actions.saveCourse(this.state.course)
       .then(() => this.redirect())
       .catch(error => {
         toastr.error(error);
-        this.setState({saving: false});
+        this.setState({ saving: false, dirty: false });
       });
   }
 
   redirect() {
-    this.setState({saving: false});
+    this.setState({ saving: false, dirty: false });
     toastr.success('Course saved');
     this.context.router.push('/courses');
   }

@@ -4,7 +4,7 @@
    * be sure to add logic to not delete authors with courses 
 
 -Delete course
-   * Hide empty course list once all courses are deleted
+   * _[x]_ Hide empty course list once all courses are deleted
 
 -Unsaved changes message
   * guard against losing work
@@ -14,7 +14,7 @@
 -Handle 404's
   * ManageCourse add logic state-to-props
 
--Show # of courses in Header
+- _[x]_Show # of courses in Header
 
 -Pagination/Infinite Scrolling
 

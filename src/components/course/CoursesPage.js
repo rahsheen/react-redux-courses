@@ -3,13 +3,15 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as courseActions from '../../actions/courseActions';
 import CourseList from './CourseList';
-import {browserHistory} from 'react-router';
+import { browserHistory } from 'react-router';
+import toastr from 'toastr';
 
-class CoursesPage extends Component {
+export class CoursesPage extends Component {
   constructor(props, context) {
     super(props, context);
 
     this.redirectToAddCoursePage = this.redirectToAddCoursePage.bind(this);
+    this.deleteClick = this.deleteClick.bind(this);
   }
 
   courseRow(course, index) {
@@ -20,19 +22,42 @@ class CoursesPage extends Component {
     browserHistory.push('/course');
   }
 
+  deleteClick(event) {
+    event.preventDefault();
+
+    this.props.actions.deleteCourse(event.target.id)
+      .then(() => toastr.success(`Course Deleted!`))
+      .catch(error => {
+        toastr.error(`Couldn't delete course!`);
+        console.error(error);
+      });
+  }
+
   render() {
     const { courses } = this.props;
 
-    return (
-      <div>
-        <h1>Courses</h1>
-        <input type="submit"
-          value="Add Course"
-          className="btn btn-primary"
-          onClick={this.redirectToAddCoursePage} />
-        <CourseList courses={courses} />
-      </div>
-    );
+    if (courses.length > 0) {
+      return (
+        <div>
+          <h1>Courses ({courses.length})</h1>
+          <input type="button"
+            value="Add Course"
+            className="btn btn-primary"
+            onClick={this.redirectToAddCoursePage} />
+          <CourseList courses={courses} deleteClick={this.deleteClick} />
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <h1>No Courses</h1>
+          <input type="submit"
+            value="Add Course"
+            className="btn btn-primary"
+            onClick={this.redirectToAddCoursePage} />
+        </div>
+      );
+    }
   }
 }
 
