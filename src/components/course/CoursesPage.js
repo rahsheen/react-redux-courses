@@ -29,7 +29,6 @@ export class CoursesPage extends Component {
       .then(() => toastr.success(`Course Deleted!`))
       .catch(error => {
         toastr.error(`Couldn't delete course!`);
-        console.error(error);
       });
   }
 
