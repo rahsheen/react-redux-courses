@@ -5,6 +5,7 @@ import * as courseActions from '../../actions/courseActions';
 import CourseForm from './CourseForm';
 import toastr from 'toastr';
 import { authorsFormattedForDropdown } from '../../selectors/selectors';
+import { browserHistory } from 'react-router';
 
 export class ManageCoursePage extends Component {
   constructor(props, context) {
@@ -21,11 +22,26 @@ export class ManageCoursePage extends Component {
     this.saveCourse = this.saveCourse.bind(this);
   }
 
+  componentDidMount() {
+    this.unlisten = browserHistory.listen(this.routerWillLeave.bind(this));
+  }
+
   componentWillReceiveProps(nextProps) {
     if (this.props.course.id != nextProps.course.id) {
       // Necessary to populate form when existing course is loaded directly.
       this.setState({ course: Object.assign({}, nextProps.course) });
     }
+  }
+
+  componentWillUnmount() {
+    this.unlisten();
+  }
+
+  routerWillLeave(nextLocation) {
+    // https://github.com/ReactTraining/react-router/blob/v2.4.0/examples/confirming-navigation/app.js
+    // **ALLEGEDLY** return false to prevent a transition w/o prompting the user,
+    // or return a string to allow the user to decide:
+    return false; // Clearly doesn't prevent navigation away
   }
 
   updateCourseState(event) {
